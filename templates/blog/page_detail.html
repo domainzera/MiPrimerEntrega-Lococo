@@ -1,0 +1,25 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{{ page.titulo }}{% endblock %}
+
+{% block content %}
+    <article>
+        {% if page.imagen %}
+            <img src="{{ page.imagen.url }}" alt="{{ page.titulo }}" style="max-width:100%; border-radius:6px;">
+        {% endif %}
+        <h2>{{ page.titulo }}</h2>
+        <p><strong>{{ page.subtitulo }}</strong></p>
+        <p><small>{{ page.fecha_publicacion|date:"d/m/Y" }} — {{ page.autor.username }}</small></p>
+        <div>{{ page.contenido|safe }}</div>
+    </article>
+
+    <div class="actions">
+        <a href="{% url 'page_list' %}" class="btn btn-secondary">Volver al listado</a>
+        {% if user.is_authenticated %}
+            {% if user == page.autor or user.is_staff %}
+            <a href="{% url 'page_update' page.pk %}" class="btn">Editar</a>
+            <a href="{% url 'page_delete' page.pk %}" class="btn btn-danger">Eliminar</a>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}

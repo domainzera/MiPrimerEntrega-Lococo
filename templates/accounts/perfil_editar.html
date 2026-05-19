@@ -1,0 +1,21 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Editar perfil{% endblock %}
+
+{% block content %}
+    <h2>Editar perfil</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+            <p>
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <ul class="errors">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                {% endif %}
+            </p>
+        {% endfor %}
+        <button type="submit" class="btn">Guardar cambios</button>
+        <a href="{% url 'perfil' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}

@@ -1,85 +1,107 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
-from .forms import AutorForm, BuscarPostForm, CategoriaForm, PostForm
-from .models import Post
+from .forms import BuscarPageForm, PageForm
+from .models import Page
 
 
 def inicio(request):
     return render(request, "blog/inicio.html")
 
 
-def crear_autor(request):
-    if request.method == "POST":
-        form = AutorForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return render(
-                request,
-                "blog/form_exito.html",
-                {"mensaje": "Autor creado correctamente."},
-            )
-    else:
-        form = AutorForm()
-    return render(
-        request,
-        "blog/formulario.html",
-        {"form": form, "titulo": "Crear autor"},
-    )
+def about(request):
+    return render(request, "blog/about.html")
 
 
-def crear_categoria(request):
-    if request.method == "POST":
-        form = CategoriaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return render(
-                request,
-                "blog/form_exito.html",
-                {"mensaje": "Categoria creada correctamente."},
-            )
-    else:
-        form = CategoriaForm()
-    return render(
-        request,
-        "blog/formulario.html",
-        {"form": form, "titulo": "Crear categoria"},
-    )
+class PageListView(ListView):
+    model = Page
+    template_name = "blog/page_list.html"
+    context_object_name = "pages"
+
+    def get_queryset(self):
+        return Page.objects.select_related("autor")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form_buscar"] = BuscarPageForm(self.request.GET or None)
+        return context
 
 
-def crear_post(request):
-    if request.method == "POST":
-        form = PostForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return render(
-                request,
-                "blog/form_exito.html",
-                {"mensaje": "Post creado correctamente."},
-            )
-    else:
-        form = PostForm()
-    return render(
-        request,
-        "blog/formulario.html",
-        {"form": form, "titulo": "Crear post"},
-    )
+class PageDetailView(DetailView):
+    model = Page
+    template_name = "blog/page_detail.html"
+    context_object_name = "page"
 
 
-def buscar_post(request):
+class PageCreateView(LoginRequiredMixin, CreateView):
+    model = Page
+    form_class = PageForm
+    template_name = "blog/page_form.html"
+    success_url = reverse_lazy("page_list")
+
+    def form_valid(self, form):
+        form.instance.autor = self.request.user
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["titulo"] = "Crear página"
+        return context
+
+
+class PageUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Page
+    form_class = PageForm
+    template_name = "blog/page_form.html"
+    success_url = reverse_lazy("page_list")
+
+    def test_func(self):
+        page = self.get_object()
+        return self.request.user == page.autor or self.request.user.is_staff
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["titulo"] = "Editar página"
+        return context
+
+
+class PageDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Page
+    template_name = "blog/page_confirm_delete.html"
+    success_url = reverse_lazy("page_list")
+
+    def test_func(self):
+        page = self.get_object()
+        return self.request.user == page.autor or self.request.user.is_staff
+
+
+def buscar_page(request):
     resultados = []
-    titulo = ""
+    titulo_buscado = ""
 
-    if request.method == "GET":
-        form = BuscarPostForm(request.GET)
+    if request.method == "GET" and request.GET:
+        form = BuscarPageForm(request.GET)
         if form.is_valid():
-            titulo = form.cleaned_data["titulo"]
-            if titulo:
-                resultados = Post.objects.filter(titulo__icontains=titulo)
+            titulo_buscado = form.cleaned_data["titulo"]
+            if titulo_buscado:
+                resultados = Page.objects.filter(titulo__icontains=titulo_buscado)
     else:
-        form = BuscarPostForm()
+        form = BuscarPageForm()
 
     return render(
         request,
-        "blog/buscar_post.html",
-        {"form": form, "resultados": resultados, "titulo_buscado": titulo},
+        "blog/buscar_page.html",
+        {
+            "form": form,
+            "resultados": resultados,
+            "titulo_buscado": titulo_buscado,
+        },
     )

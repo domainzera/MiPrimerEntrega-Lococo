@@ -1,0 +1,23 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Mensajes recibidos{% endblock %}
+
+{% block content %}
+    <h2>Mensajes recibidos</h2>
+    <p>
+        <a href="{% url 'mensaje_nuevo' %}" class="btn">Nuevo mensaje</a>
+        <a href="{% url 'mensaje_enviados' %}" class="btn btn-secondary">Ver enviados</a>
+    </p>
+
+    {% if mensajes %}
+        {% for mensaje in mensajes %}
+            <article class="card {% if not mensaje.leido %}no-leido{% endif %}">
+                <h3><a href="{% url 'mensaje_detalle' mensaje.pk %}">{{ mensaje.asunto }}</a></h3>
+                <p>De: {{ mensaje.remitente.username }} — {{ mensaje.fecha|date:"d/m/Y H:i" }}</p>
+                {% if not mensaje.leido %}<span class="alert alert-info">Nuevo</span>{% endif %}
+            </article>
+        {% endfor %}
+    {% else %}
+        <p class="alert alert-info">No tenés mensajes recibidos.</p>
+    {% endif %}
+{% endblock %}

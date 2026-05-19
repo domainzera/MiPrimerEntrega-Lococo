@@ -1,7 +1,10 @@
 from django.contrib import admin
 
-from .models import Autor, Categoria, Post
+from .models import Page
 
-admin.site.register(Autor)
-admin.site.register(Categoria)
-admin.site.register(Post)
+
+@admin.register(Page)
+class PageAdmin(admin.ModelAdmin):
+    list_display = ("titulo", "subtitulo", "autor", "fecha_publicacion")
+    list_filter = ("fecha_publicacion", "autor")
+    search_fields = ("titulo", "subtitulo", "contenido")

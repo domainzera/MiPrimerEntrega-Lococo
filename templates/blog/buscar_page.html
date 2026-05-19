@@ -1,0 +1,27 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Buscar páginas{% endblock %}
+
+{% block content %}
+    <h2>Buscar páginas</h2>
+    <form method="get">
+        {{ form.titulo.label_tag }}
+        {{ form.titulo }}
+        <button type="submit" class="btn">Buscar</button>
+    </form>
+
+    {% if titulo_buscado %}
+        {% if resultados %}
+            <h3>Resultados para "{{ titulo_buscado }}"</h3>
+            {% for page in resultados %}
+                <article class="card">
+                    <h3>{{ page.titulo }}</h3>
+                    <p>{{ page.subtitulo }}</p>
+                    <a href="{% url 'page_detail' page.pk %}" class="btn">Leer más</a>
+                </article>
+            {% endfor %}
+        {% else %}
+            <p class="alert alert-warning">No se encontraron páginas con ese título.</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}

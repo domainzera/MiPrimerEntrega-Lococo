@@ -1,0 +1,27 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Páginas{% endblock %}
+
+{% block content %}
+    <h2>Páginas del blog</h2>
+
+    {% if user.is_authenticated %}
+        <p><a href="{% url 'page_create' %}" class="btn">Crear página</a></p>
+    {% endif %}
+
+    {% if pages %}
+        {% for page in pages %}
+            <article class="card">
+                {% if page.imagen %}
+                    <img src="{{ page.imagen.url }}" alt="{{ page.titulo }}">
+                {% endif %}
+                <h3>{{ page.titulo }}</h3>
+                <p><strong>{{ page.subtitulo }}</strong></p>
+                <p><small>Publicado el {{ page.fecha_publicacion|date:"d/m/Y" }} por {{ page.autor.username }}</small></p>
+                <a href="{% url 'page_detail' page.pk %}" class="btn">Leer más</a>
+            </article>
+        {% endfor %}
+    {% else %}
+        <p class="alert alert-info">No hay páginas aún.</p>
+    {% endif %}
+{% endblock %}

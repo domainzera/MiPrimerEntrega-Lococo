@@ -1,0 +1,13 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Nuevo mensaje{% endblock %}
+
+{% block content %}
+    <h2>Enviar mensaje</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Enviar</button>
+        <a href="{% url 'mensaje_recibidos' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}

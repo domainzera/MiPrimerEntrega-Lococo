@@ -1,0 +1,12 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{{ mensaje.asunto }}{% endblock %}
+
+{% block content %}
+    <h2>{{ mensaje.asunto }}</h2>
+    <p><strong>De:</strong> {{ mensaje.remitente.username }}</p>
+    <p><strong>Para:</strong> {{ mensaje.destinatario.username }}</p>
+    <p><strong>Fecha:</strong> {{ mensaje.fecha|date:"d/m/Y H:i" }}</p>
+    <div class="card">{{ mensaje.cuerpo|linebreaks }}</div>
+    <a href="{% url 'mensaje_recibidos' %}" class="btn btn-secondary">Volver</a>
+{% endblock %}

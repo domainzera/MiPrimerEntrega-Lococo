@@ -1,33 +1,40 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Blog de Ejemplo{% endblock %}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f7f7f7; }
-        header { background: #1f3a5f; color: white; padding: 1rem; }
-        nav a { color: white; margin-right: 1rem; text-decoration: none; font-weight: bold; }
-        main { max-width: 900px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; }
-        .item { border-bottom: 1px solid #eee; padding: 0.75rem 0; }
-        .item:last-child { border-bottom: none; }
-        .msg { color: #0a7d2d; font-weight: bold; }
-        button { background: #1f3a5f; color: white; border: none; padding: 0.6rem 1rem; border-radius: 4px; cursor: pointer; }
-        input, select, textarea { width: 100%; margin-bottom: 1rem; padding: 0.6rem; box-sizing: border-box; }
-    </style>
+    <title>{% block title %}Blog{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
     <header>
-        <h1>Blog de ejemplo - Django MVT</h1>
+        <h1>Mi Blog</h1>
         <nav>
-            <a href="{% url 'inicio' %}">Inicio</a>
-            <a href="{% url 'crear_autor' %}">Nuevo Autor</a>
-            <a href="{% url 'crear_categoria' %}">Nueva Categoria</a>
-            <a href="{% url 'crear_post' %}">Nuevo Post</a>
-            <a href="{% url 'buscar_post' %}">Buscar Post</a>
+            <a href="{% url 'inicio' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'page_list' %}">Pages</a>
+            <a href="{% url 'page_buscar' %}">Buscar</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'mensaje_recibidos' %}">Mensajes</a>
+                <a href="{% url 'perfil' %}">Perfil</a>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'signup' %}">Signup</a>
+            {% endif %}
         </nav>
     </header>
     <main>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
         {% block content %}{% endblock %}
     </main>
 </body>

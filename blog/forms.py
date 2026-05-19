@@ -1,29 +1,22 @@
 from django import forms
 
-from .models import Autor, Categoria, Post
+from .models import Page
 
 
-class AutorForm(forms.ModelForm):
-    class Meta:
-        model = Autor
-        fields = ["nombre", "email", "biografia"]
-
-
-class CategoriaForm(forms.ModelForm):
-    class Meta:
-        model = Categoria
-        fields = ["nombre", "descripcion"]
-
-
-class PostForm(forms.ModelForm):
+class PageForm(forms.ModelForm):
     fecha_publicacion = forms.DateField(
         widget=forms.DateInput(attrs={"type": "date"})
     )
 
     class Meta:
-        model = Post
-        fields = ["titulo", "contenido", "fecha_publicacion", "autor", "categoria"]
+        model = Page
+        fields = ["titulo", "subtitulo", "contenido", "imagen", "fecha_publicacion"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields["imagen"].required = False
 
 
-class BuscarPostForm(forms.Form):
-    titulo = forms.CharField(max_length=150, required=False)
+class BuscarPageForm(forms.Form):
+    titulo = forms.CharField(max_length=150, required=False, label="Buscar por título")
